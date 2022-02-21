@@ -277,12 +277,13 @@ class Parser
      */
     protected function getFilterParams()
     {
-        $reserved = array_fill_keys($this->functions, true);
-        $prefix = $this->prefix;
+        $reserved = array_map(function($function) {
+            return $this->prefix . $function;
+        }, $this->functions);
 
-        $filterParams = array_diff_ukey($this->params, $reserved, function ($a, $b) use ($prefix) {
-            return $a != $prefix.$b;
-        });
+        $filterParams = array_filter($this->params, function($key) use($reserved) {
+            return !in_array($key, $reserved);
+        }, ARRAY_FILTER_USE_KEY);
 
         if (count($filterParams) > 0) {
             return $filterParams;
