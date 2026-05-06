@@ -1,6 +1,6 @@
 <?php namespace Marcelgwerder\ApiHandler;
 
-use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Response;
 
 class ApiHandler
@@ -16,7 +16,7 @@ class ApiHandler
     public function parseSingle($queryBuilder, $identification, $queryParams = false)
     {
         if ($queryParams === false) {
-            $queryParams = Input::get();
+            $queryParams = Request::all();
         }
 
         $parser = new Parser($queryBuilder, $queryParams);
@@ -36,7 +36,7 @@ class ApiHandler
     public function parseMultiple($queryBuilder, $fullTextSearchColumns = array(), $queryParams = false)
     {
         if ($queryParams === false) {
-            $queryParams = Input::get();
+            $queryParams = Request::all();
         }
 
         $parser = new Parser($queryBuilder, $queryParams);
