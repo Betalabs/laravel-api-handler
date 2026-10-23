@@ -19,12 +19,9 @@ class CountMetaProvider extends MetaProvider
 
         if($builder instanceof QueryBuilder) {
             $this->builder = $builder;
-        } else if(method_exists($builder, 'toBase')) {
-            // Laravel > 5.2 as global scopes, toBase makes sure they are included.
-            $this->builder = $builder->toBase();
         } else {
-            // Laravel < 5.2 did not have global scopes and thus the query builder is enough.
-            $this->builder = $builder->getQuery();
+            // toBase() keeps the global scopes of the Eloquent builder
+            $this->builder = $builder->toBase();
         }
 
         $this->title = $title;
@@ -34,6 +31,8 @@ class CountMetaProvider extends MetaProvider
 
         //Remove orders from builder because they are irrelevant for counts and can cause errors with renamed columns
         $this->builder->orders = null;
+        //Their bindings must go too, otherwise the count query sends more values than placeholders
+        $this->builder->bindings['order'] = [];
     }
 
     /**
