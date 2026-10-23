@@ -1,0 +1,22 @@
+name: Tests
+
+on:
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.2', '8.3', '8.4', '8.5']
+        dependencies: ['lowest', 'highest']
+    name: PHP ${{ matrix.php }} (${{ matrix.dependencies }})
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, mbstring, curl, xml, pdo_sqlite, sqlite3
+      - run: composer update --no-interaction --prefer-dist --no-progress ${{ matrix.dependencies == 'lowest' && '--prefer-lowest --prefer-stable' || '' }}
+      - run: vendor/bin/phpunit

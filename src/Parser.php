@@ -120,6 +120,22 @@ class Parser
     protected $isQueryBuilder = false;
 
     /**
+     * Config handler set by setConfigHandler() (declared: dynamic properties
+     * are deprecated since PHP 8.2)
+     *
+     * @var mixed
+     */
+    protected $config;
+
+    /**
+     * Prefix of the functional params (apihandler.prefix), declared for the
+     * same reason as $config
+     *
+     * @var string
+     */
+    protected $prefix;
+
+    /**
      * Instantiate the Parser class
      *
      * @param mixed $builder
@@ -379,39 +395,23 @@ class Parser
 
                 if ($relationType === 'BelongsTo') {
 
-                    if(method_exists($relation, 'getQualifiedForeignKeyName')) {
-                        $firstKey = $relation->getQualifiedForeignKeyName();
-                    } else {
-                        // compatibility for laravel < 5.8
-                        $firstKey = $relation->getQualifiedForeignKey();
-                    }
+                    $firstKey = $relation->getQualifiedForeignKeyName();
 
                     $secondKey = $relation->getQualifiedParentKeyName();
 
                 } else if ($relationType === 'HasMany' || $relationType === 'HasOne') {
                     $firstKey = $relation->getQualifiedParentKeyName();
-                    if (method_exists($relation, 'getQualifiedForeignKeyName')) {
-                        $secondKey = $relation->getQualifiedForeignKeyName();
-                    } else {
-                        // compatibility for laravel < 5.4
-                        $secondKey = $relation->getForeignKey();
-                    }
+
+                    $secondKey = $relation->getQualifiedForeignKeyName();
                 } else if ($relationType === 'BelongsToMany') {
                     $firstKey = $relation->getQualifiedParentKeyName();
                     $secondKey = $relation->getRelated()->getQualifiedKeyName();
                 } else if ($relationType === 'HasManyThrough') {
-                    if (method_exists($relation, 'getQualifiedLocalKeyName')) {
-                        $firstKey = $relation->getQualifiedLocalKeyName();
-                    } else if (method_exists($relation, 'getExistenceCompareKey')) {
-                        // compatibility for laravel 5.4
-                        $firstKey = $relation->getExistenceCompareKey();
-                    } else {
-                        // compatibility for laravel < 5.4
-                        $firstKey = $relation->getHasCompareKey();
-                    }
+                    $firstKey = $relation->getQualifiedLocalKeyName();
                     $secondKey = null;
                 } else {
-                    die('Relation type not supported!');
+                    // Was a die(), which ended the whole request
+                    throw new ApiHandlerException('UnknownResourceRelation', ['relation' => $part]);
                 }
 
                 //Check if we're on level 1 (e.g. a and not a.b)
@@ -617,7 +617,8 @@ class Parser
             $this->query->whereRaw('MATCH('.implode(',', $fullTextSearchColumns).') AGAINST("'.$qParam.'" IN BOOLEAN MODE)');
 
             //Add the * to the selects because of the score column
-            if (count($this->query->columns) == 0) {
+            // columns is null when no field was selected (count(null) is a TypeError in PHP 8)
+            if (count($this->query->columns ?: []) == 0) {
                 $this->query->addSelect('*');
             }
 

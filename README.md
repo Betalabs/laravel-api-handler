@@ -1,30 +1,40 @@
 ## Laravel API Handler
-[![Build Status](https://travis-ci.org/marcelgwerder/laravel-api-handler.png?branch=master)](https://travis-ci.org/marcelgwerder/laravel-api-handler) [![Latest Stable Version](https://poser.pugx.org/marcelgwerder/laravel-api-handler/v/stable.png)](https://packagist.org/packages/marcelgwerder/laravel-api-handler) [![Total Downloads](https://poser.pugx.org/marcelgwerder/laravel-api-handler/downloads.png)](https://packagist.org/packages/marcelgwerder/laravel-api-handler) [![License](https://poser.pugx.org/marcelgwerder/laravel-api-handler/license.png)](https://packagist.org/packages/marcelgwerder/laravel-api-handler)
 
-This helper package provides functionality for parsing the URL of a REST-API request.
+Betalabs fork of [marcelgwerder/laravel-api-handler](https://github.com/marcelgwerder/laravel-api-handler): parses the URL of a REST-API request (fields, filters, sort, pagination, relations and counts) into an Eloquent query.
+
+### Requirements
+
+| | Version |
+|---|---|
+| PHP | 8.2 to 8.5 |
+| Laravel | 10, 11 or 12 |
+
+Projects on Laravel 9 or older (or PHP below 8.2) must stay on version `4.x`.
 
 ### Installation
 
-***Note:*** This version is for Laravel 5. When using Laravel 4 you need to use version 0.4.x.
-
-Install the package through composer by running 
+Install the package through composer by running
 ```
-composer require marcelgwerder/laravel-api-handler
+composer require betalabs/laravel-api-handler
 ```
 
-Once composer finished add the service provider to the `providers` array in `app/config/app.php`:
+Add the service provider to the `providers` array in `config/app.php` (there is no package discovery):
 ```
 Marcelgwerder\ApiHandler\ApiHandlerServiceProvider::class,
 ```
-Now import the `ApiHandler` facade into your classes:
+Then import the facade into your classes:
 ```php
 use Marcelgwerder\ApiHandler\Facades\ApiHandler;
 ```
-Or set an alias in `app.php`:
+
+### Tests
+
 ```
-'ApiHandler' => Marcelgwerder\ApiHandler\Facades\ApiHandler::class,
+composer install
+vendor/bin/phpunit
 ```
-That's it!
+
+The tests use Orchestra Testbench with an in-memory SQLite database.
 
 ### Migrate from 0.3.x to >= 0.4.x
 
