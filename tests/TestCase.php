@@ -22,6 +22,10 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
+        // Laravel sends PHP deprecations to a log by default; throw them
+        // instead so a deprecated call fails the suite.
+        $this->withoutDeprecationHandling();
+
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('first_name');

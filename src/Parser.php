@@ -128,6 +128,14 @@ class Parser
     protected $config;
 
     /**
+     * Prefix of the functional params (apihandler.prefix), declared for the
+     * same reason as $config
+     *
+     * @var string
+     */
+    protected $prefix;
+
+    /**
      * Instantiate the Parser class
      *
      * @param mixed $builder
